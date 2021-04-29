@@ -39,6 +39,12 @@
             "fromversion": "5.0.0"
         },
         {
+            "integrations": "Kaspersky Security Center",
+            "instance_names": "testing_server_keys",
+            "playbookID": "Kaspersky Security Center - Test",
+            "fromversion": "5.5.0"
+        },
+        {
             "integrations": "AzureWAF",
             "instance_names": "azure_waf_prod",
             "playbookID": "Azure WAF - Test",
