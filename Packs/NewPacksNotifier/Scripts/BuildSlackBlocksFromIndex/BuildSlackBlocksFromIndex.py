@@ -20,13 +20,15 @@ PACK_ID_REGEX = r'\s|-|\.'
 
 
 class IndexPack:
+    """ A pack that represents a pack that is created from the index """
+
     def __init__(self, path: str, pack_id: str):
         self.index_path: str = path
         self.id: str = pack_id
         self.metadata_path: str = self.get_metadata_path()
         self.metadata: dict = load_json(self.metadata_path)
-        self.name: str = self.metadata.get('name')
-        self.created: str = self.metadata.get('created')
+        self.name: str = self.metadata.get('name', '')
+        self.created: str = self.metadata.get('created', '')
         self.created_datetime: datetime = datetime.strptime(self.created, DATE_FORMAT).replace(tzinfo=pytz.UTC)
         self.price: int = self.metadata.get('price', 0)
         self._is_private_pack: bool = True if self.metadata.get('partnerId') else False
@@ -44,6 +46,14 @@ class IndexPack:
             return ''
 
     def get_description(self) -> str:
+        """ Parses the description.
+        If description is longer than DESCRIPTION_MAX_LENGTH, detects the last word that fits in DESCRIPTION_MAX_LENGTH
+        and appends "..." at the end.
+
+        Returns:
+            The parsed description
+
+        """
         description = self.metadata.get('description', '')
         description_words = []
         aggregated_length = 0
@@ -62,10 +72,20 @@ class IndexPack:
         return parsed_description
 
     def is_released_after_last_run(self, last_run_datetime: datetime) -> bool:
+        """ Indicates whether the packed was released after the given date.
+
+        Args:
+            last_run_datetime: The last time the script ran.
+
+        Returns:
+            True if the pack was released after the given date, False otherwise.
+
+        """
         demisto.debug(f'{self.id} pack was created at {self.created}')
         return self.created_datetime > last_run_datetime
 
     def to_context(self) -> dict:
+        """ Dumps a pack object into a dict representation to be store in the incident's context """
         return {
             'name': self.name,
             'id': self.id,
@@ -78,6 +98,8 @@ class IndexPack:
 
 
 class Index:
+    """ A pack that represents the index """
+
     def __init__(self, index_file_entry_id: str):
         self.index_data: dict = get_file_data(index_file_entry_id)
         self.download_index_path: str = self.index_data['path']
@@ -88,6 +110,7 @@ class Index:
         self.new_packs: List[IndexPack] = []
 
     def extract(self):
+        """ Extract the index from the zip file """
         if os.path.exists(self.download_index_path):
             demisto.debug('Found existing index.zip')
             with ZipFile(self.download_index_path, 'r') as index_zip:
@@ -104,6 +127,7 @@ class Index:
             raise Exception(error_msg)
 
     def get_packs(self) -> List[IndexPack]:
+        """ Build IndexPack object for each pack in the index """
         packs = []
 
         for file in os.scandir(self.index_folder_path):
@@ -114,6 +138,15 @@ class Index:
         return packs
 
     def get_new_packs_from_last_run(self, last_run_str: str) -> List[IndexPack]:
+        """ Creates a list of all packs that were released after the given time.
+
+        Args:
+            last_run_str: The last time the script ran.
+
+        Returns:
+            The list of new packs.
+
+        """
         last_run_datetime = parse(last_run_str).replace(tzinfo=pytz.UTC)
         demisto.debug(f'last message time was: {last_run_str}')
 
@@ -125,6 +158,12 @@ class Index:
         return self.new_packs
 
     def get_latest_new_pack_created_time(self) -> str:
+        """ The new pack with the latest created time is the last new pack that the script has detected,
+        therefore, the next run should start from its created time.
+
+        Returns:
+
+        """
         latest_new_pack_created_datetime = datetime(1970, 1, 1, tzinfo=pytz.utc)
         for new_pack in self.new_packs:
             if new_pack.created_datetime > latest_new_pack_created_datetime:
@@ -134,6 +173,8 @@ class Index:
 
 
 class SlackBlocks:
+    """ A pack that builds the Slack Blocks object """
+
     def __init__(self, packs: List[IndexPack]):
         self.packs: List[IndexPack] = sorted(
             packs, key=lambda p: SUPPORT.index(p.support) if p.support in SUPPORT else 3
@@ -248,6 +289,15 @@ def load_json(file_path: str) -> dict:
 
 
 def get_file_data(file_entry_id: str) -> dict:
+    """ Gets the file data (includes the file path) of the file id
+
+    Args:
+        file_entry_id: The file id
+
+    Returns:
+        The file data
+
+    """
     res = demisto.executeCommand('getFilePath', {'id': file_entry_id})
 
     if res[0]['Type'] == entryTypes['error']:
@@ -257,6 +307,17 @@ def get_file_data(file_entry_id: str) -> dict:
 
 
 def return_results_to_context(new_packs, last_run, blocks, updated_last_run):
+    """ Returns all script's data into context
+
+    Args:
+        new_packs: The list of all new packs
+        last_run: The last run the script worked against
+        blocks: The Slack Blocks object
+        updated_last_run: The updated last run
+
+    Returns:
+
+    """
     return_results([
         CommandResults(
             outputs=new_packs,

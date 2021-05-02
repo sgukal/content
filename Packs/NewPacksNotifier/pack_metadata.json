@@ -1,6 +1,6 @@
 {
-    "name": "Send Content Updates to DFIR",
-    "description": "Send Content Updates to DFIR",
+    "name": "New Packs Notifier",
+    "description": "Send updates on new released packs to slack channel",
     "support": "xsoar",
     "currentVersion": "1.0.0",
     "author": "Cortex XSOAR",
