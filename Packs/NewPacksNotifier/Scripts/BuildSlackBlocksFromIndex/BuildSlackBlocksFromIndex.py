@@ -169,6 +169,9 @@ class Index:
             if new_pack.created_datetime > latest_new_pack_created_datetime:
                 latest_new_pack_created_datetime = new_pack.created_datetime
 
+        if latest_new_pack_created_datetime == datetime(1970, 1, 1, tzinfo=pytz.utc):  # No new packs were found
+            latest_new_pack_created_datetime = datetime.utcnow()
+
         return latest_new_pack_created_datetime.strftime(DATE_FORMAT)
 
 
@@ -195,6 +198,7 @@ class SlackBlocks:
 
             if self._list_packs:
                 blocks.append(self.get_divider_block())
+                blocks.append(self.get_list_packs_header_block())
                 blocks.append(self.build_list_packs_block())
 
             blocks.append(self.get_divider_block())
@@ -203,6 +207,16 @@ class SlackBlocks:
             return json.dumps(blocks)
 
         return "no new packs"
+
+    @staticmethod
+    def get_list_packs_header_block():
+        return {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*More new packs that have been released this week:*\n"
+            }
+        }
 
     @staticmethod
     def get_divider_block() -> dict:
@@ -230,20 +244,19 @@ class SlackBlocks:
         }
 
     @staticmethod
+    def get_price_text(price):
+        return "FREE" if str(price) == "0" else f"{price} :cortex-coins:"
+
+    @staticmethod
     def build_pack_context_block(price: int, support: str) -> dict:
-        if support == "xsoar":
-            support_text = ":cortexpeelable: XSOAR Supported"
-        elif support == "partner":
-            support_text = "Partner Supported"
-        else:
-            support_text = "Community Contributed"
+        support_text = SlackBlocks.get_support_text(support)
 
         return {
             "type": "context",
             "elements": [
                 {
                     "type": "mrkdwn",
-                    "text": "FREE" if str(price) == "0" else f"{price} :cortex-coins:"
+                    "text": SlackBlocks.get_price_text(price)
                 },
                 {
                     "type": "mrkdwn",
@@ -252,16 +265,29 @@ class SlackBlocks:
             ]
         }
 
+    @staticmethod
+    def get_support_text(support):
+        if support == "xsoar":
+            return ":cortexpeelable: XSOAR Supported"
+        elif support == "partner":
+            return "Partner Supported"
+        else:
+            return "Community Contributed"
+
     def build_list_packs_block(self) -> dict:
-        text = "*More packs that have been released this week:*\n"
+        packs_str = ""
+
         for pack in self._list_packs:
-            text += f"*<{MP_PACK_LINK}/{pack.pan_dev_mp_id}|{pack.name}>*\n"
+            packs_str += f"*<{MP_PACK_LINK}/{pack.pan_dev_mp_id}|{pack.name}>* | "
+            packs_str += f"By: {pack.author} | "
+            packs_str += f"{self.get_price_text(pack.price)} | "
+            packs_str += f"{self.get_support_text(pack.support)}\n"
 
         return {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": text
+                "text": packs_str
             }
         }
 
@@ -358,7 +384,7 @@ def main():
         new_packs: List[IndexPack] = index.get_new_packs_from_last_run(last_run)
         updated_last_run: str = index.get_latest_new_pack_created_time()
         blocks: str = SlackBlocks(new_packs).build()
-        demisto.debug(blocks)
+        demisto.info(blocks)
         return_results_to_context([new_pack.to_context() for new_pack in new_packs], last_run, blocks, updated_last_run)
 
     except Exception as e:

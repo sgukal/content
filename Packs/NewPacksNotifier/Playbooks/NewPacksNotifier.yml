@@ -17,18 +17,18 @@ tasks:
     skipunavailable: false
     task:
       brand: ""
-      id: cadd65da-e426-424a-87d7-3939d03a8013
+      id: 0fcb6b5c-dde0-442e-83da-06180ef40bda
       iscommand: false
       name: ""
       version: -1
       description: ''
-    taskid: cadd65da-e426-424a-87d7-3939d03a8013
+    taskid: 0fcb6b5c-dde0-442e-83da-06180ef40bda
     timertriggers: []
     type: start
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 50
         }
       }
@@ -42,28 +42,27 @@ tasks:
     quietmode: 0
     scriptarguments:
       bucket_name:
-        simple: shula
+        simple: marketplace-dist
       object_name:
         simple: content/packs/index.zip
-      saved_file_name: {}
     separatecontext: false
     skipunavailable: false
     task:
       brand: ""
       description: Retrieves object data into a file.
-      id: d3362c4d-82e7-45e8-8385-b7b87d86d0d7
+      id: 24dc713f-db4d-471d-8797-1d3683f7f5c8
       iscommand: true
       name: Download Index.zip from marketplace-dist
       script: '|||gcs-download-file'
       type: regular
       version: -1
-    taskid: d3362c4d-82e7-45e8-8385-b7b87d86d0d7
+    taskid: 24dc713f-db4d-471d-8797-1d3683f7f5c8
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 195
         }
       }
@@ -80,25 +79,27 @@ tasks:
         simple: ${File.EntryID}
       last_message_time_str:
         simple: ${LastRun}
+      last_run_str:
+        simple: ${LastRun}
     separatecontext: false
     skipunavailable: false
     task:
       brand: ""
       description: Extract the index and gets a list of all new packs since last run
         into context.
-      id: d4b91e92-f4a1-49a4-88d3-c2231b6868fc
+      id: b02f3151-a6af-4d75-8a9d-56bbec35233f
       iscommand: false
       name: Build Slack Blocks From Index
       script: BuildSlackBlocksFromIndex
       type: regular
       version: -1
-    taskid: d4b91e92-f4a1-49a4-88d3-c2231b6868fc
+    taskid: b02f3151-a6af-4d75-8a9d-56bbec35233f
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 1070
         }
       }
@@ -128,18 +129,18 @@ tasks:
     task:
       brand: ""
       description: Check if slack blocks is not "no new packs"
-      id: 24fbed4b-b2e7-4dcd-8234-95e9ecf367a7
+      id: 86ab52cf-8e14-47f6-890a-d628e634868f
       iscommand: false
       name: Check If Blocks Exists
       type: condition
       version: -1
-    taskid: 24fbed4b-b2e7-4dcd-8234-95e9ecf367a7
+    taskid: 86ab52cf-8e14-47f6-890a-d628e634868f
     timertriggers: []
     type: condition
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 1245
         }
       }
@@ -155,30 +156,25 @@ tasks:
       blocks:
         simple: ${Blocks}
       channel:
-        simple: gfr
-      entry: {}
-      ignoreAddURL: {}
-      message: {}
-      threadID: {}
-      to: {}
+        simple: gfr-test
     separatecontext: false
     skipunavailable: false
     task:
       brand: ""
       description: Sends a message to a user, group, or channel.
-      id: dd267b47-a940-48b8-8978-dd1b4ea6452e
+      id: 8a620255-581d-4745-8b44-93f448cfc9ed
       iscommand: true
       name: Send Slack Message
       script: '|||send-notification'
       type: regular
       version: -1
-    taskid: dd267b47-a940-48b8-8978-dd1b4ea6452e
+    taskid: 8a620255-581d-4745-8b44-93f448cfc9ed
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": -217.5,
+          "x": 260,
           "y": 1420
         }
       }
@@ -187,7 +183,7 @@ tasks:
     ignoreworker: false
     nexttasks:
       '#none#':
-      - "7"
+      - "11"
     note: false
     quietmode: 0
     scriptarguments:
@@ -200,19 +196,19 @@ tasks:
     task:
       brand: Builtin
       description: commands.local.cmd.list.set
-      id: e8f0b175-fb1e-4f9c-8af4-e137b156dbae
+      id: 197e6715-6804-4f5e-88ba-382ed2d76910
       iscommand: true
       name: Set Last Run
       script: Builtin|||setList
       type: regular
       version: -1
-    taskid: e8f0b175-fb1e-4f9c-8af4-e137b156dbae
+    taskid: 197e6715-6804-4f5e-88ba-382ed2d76910
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 1595
         }
       }
@@ -234,19 +230,19 @@ tasks:
     task:
       brand: Builtin
       description: commands.local.cmd.list.get
-      id: 58b9cdeb-7898-4502-8f40-21ff3d619962
+      id: 3c35c42b-f0de-4093-8e1a-994f775f317f
       iscommand: true
       name: Get Last Run
       script: Builtin|||getList
       type: regular
       version: -1
-    taskid: 58b9cdeb-7898-4502-8f40-21ff3d619962
+    taskid: 3c35c42b-f0de-4093-8e1a-994f775f317f
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 895
         }
       }
@@ -259,20 +255,20 @@ tasks:
     skipunavailable: false
     task:
       brand: ""
-      id: 3d517fa9-f205-4cf3-82a8-946174daad3b
+      id: 05f5c564-ce2d-4da7-8aef-e23abcdea891
       iscommand: false
       name: Done
       type: title
       version: -1
       description: ''
-    taskid: 3d517fa9-f205-4cf3-82a8-946174daad3b
+    taskid: 05f5c564-ce2d-4da7-8aef-e23abcdea891
     timertriggers: []
     type: title
     view: |-
       {
         "position": {
-          "x": 162.5,
-          "y": 1770
+          "x": 50,
+          "y": 1945
         }
       }
   "8":
@@ -293,19 +289,19 @@ tasks:
     task:
       brand: ""
       description: Check if list exist in demisto lists.
-      id: cf01b400-1caa-4b65-8b00-130e84ea249d
+      id: b8e4b0fa-42e3-4718-84cc-36ef9eba2f70
       iscommand: false
       name: Check If NewPacksNotifierLastRun List Exists
       script: IsListExist
       type: condition
       version: -1
-    taskid: cf01b400-1caa-4b65-8b00-130e84ea249d
+    taskid: b8e4b0fa-42e3-4718-84cc-36ef9eba2f70
     timertriggers: []
     type: condition
     view: |-
       {
         "position": {
-          "x": 162.5,
+          "x": 50,
           "y": 370
         }
       }
@@ -318,36 +314,30 @@ tasks:
     note: false
     quietmode: 0
     scriptarguments:
-      contextKey: {}
-      date: {}
       dateFormat:
         simple: iso
       daysAgo:
         simple: "7"
-      hoursAgo: {}
-      minutesAgo: {}
-      monthsAgo: {}
-      yearsAgo: {}
     separatecontext: false
     skipunavailable: false
     task:
       brand: ""
       description: |
         Retrieves the current date and time.
-      id: 04259544-a53d-4541-8e54-180d5af7db6b
+      id: 238e4ff9-b087-4f92-85cd-e62dae08dc29
       iscommand: false
       name: Get Week Ago Time
       script: GetTime
       type: regular
       version: -1
-    taskid: 04259544-a53d-4541-8e54-180d5af7db6b
+    taskid: 238e4ff9-b087-4f92-85cd-e62dae08dc29
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": 542.5,
-          "y": 545
+          "x": 260,
+          "y": 540
         }
       }
   "10":
@@ -368,20 +358,52 @@ tasks:
     task:
       brand: Builtin
       description: commands.local.cmd.list.create
-      id: af175ea3-1f5e-4c9c-897e-bc2c9f7e0016
+      id: 26efc848-d482-4d13-8d5b-5675a1cb00e0
       iscommand: true
       name: Create NewPacksNotifierLastRun List
       script: Builtin|||createList
       type: regular
       version: -1
-    taskid: af175ea3-1f5e-4c9c-897e-bc2c9f7e0016
+    taskid: 26efc848-d482-4d13-8d5b-5675a1cb00e0
     timertriggers: []
     type: regular
     view: |-
       {
         "position": {
-          "x": 542.5,
+          "x": 260,
           "y": 710
+        }
+      }
+  "11":
+    id: "11"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "7"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      closeReason:
+        simple: Done
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: Builtin
+      description: commands.local.cmd.close.inv
+      id: 6a400b3b-00c6-4165-8c98-748d444ea7ef
+      iscommand: true
+      name: Close Incident
+      script: Builtin|||closeInvestigation
+      type: regular
+      version: -1
+    taskid: 6a400b3b-00c6-4165-8c98-748d444ea7ef
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 1770
         }
       }
 version: -1
@@ -390,9 +412,9 @@ view: |-
     "linkLabelsPosition": {},
     "paper": {
       "dimensions": {
-        "height": 1785,
-        "width": 1140,
-        "x": -217.5,
+        "height": 1960,
+        "width": 590,
+        "x": 50,
         "y": 50
       }
     }
